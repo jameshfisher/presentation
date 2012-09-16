@@ -1,0 +1,215 @@
+
+body {
+  font-family: Crimson;
+  font-size: 21px;
+  width: 40em;
+  margin: 0 auto;
+  }
+
+h2 {
+  margin: 5em 0 3em 0;
+  text-align: center;
+}
+
+h5 {
+  font-size: 21px;
+  font-weight: bold;
+  font-style: italic;
+}
+
+h6 {
+  font-size: 21px;
+  font-weight: normal;
+  font-style: italic;
+}
+
+p {
+  text-align: justify;
+}
+
+@media print {
+  body {
+    font-family: "Minion Pro";
+  }
+
+  @page {
+    @bottom-center {
+      content: counter(page);
+    }
+  }
+
+  h2 {
+    page-break-before: always;
+  }
+
+  #toc-section {
+    display: none;
+  }
+}
+
+@media screen {
+  body {
+    color: #115;
+  }
+
+  #toc {
+    position: fixed;
+    top: 0;
+    left: 0;
+    font-size: 0.8em;
+  }
+
+  .toc-active {
+    font-weight: bold;
+  }
+}
+
+section.abstract h2 {
+  font-size: 1em;
+  padding-top: 10em;
+}
+
+.dedication {
+  page-break-before: always;
+  padding-top: 10em;
+}
+
+q:before {
+  content: "“";
+}
+
+q:after {
+  content: "”";
+}
+
+.c_comment {
+  background-color: #DDE;
+  border-radius: 0.1em;
+  border-width: 0 1px 1px 0;
+  border-color: #668;
+  border-style: solid;
+  padding: 0.05em 0.2em;
+}
+
+.vf_comment {
+  background-color: #DED;
+  border-radius: 0.1em;
+  border-width: 0 1px 1px 0;
+  border-color: #686;
+  border-style: solid;
+  padding: 0.05em 0.2em;
+}
+
+/*
+.vf_comment:before {
+  content: "{";
+  margin-right: 0.2em;
+}
+
+.vf_comment:after {
+  content: "}";
+  margin-left: 0.2em;
+}
+
+.vf_comment:before, .vf_comment:after  {
+  color: #955;
+  font-weight: bolder;
+  font-size: 1.3em;
+  line-height: 100%;
+  position: relative;
+  top: 0.15em;
+}*/
+
+code {
+  font-family: "Inconsolata";
+  font-size: 0.9em;
+}
+
+#toc a {
+  text-decoration: none;
+  color: black;
+}
+
+#toc ul {
+  list-style: none;
+  padding: 0;
+}
+
+.toc-h2 {
+  padding-left: 0em;
+}
+
+.toc-h3 {
+  padding-left: 2em;
+  font-style: italic;
+}
+
+.toc-h4 {
+  padding-left: 3em;
+  font-style: italic;
+}
+
+.diagram img {
+  display: inline-block;
+  margin: 0 auto;
+}
+
+.diagram {
+  text-align: center;
+}
+
+.diagram p {
+  text-align: center;
+  font-style: italic;
+}
+
+.listTable4 {
+  padding: 0;
+}
+.listTable4 li {
+  display: inline-block;
+  width: 24%;
+}
+
+.kv_table {
+  width: 100%;
+}
+.kv_table th, .kv_table td {
+  vertical-align: top;
+}
+
+.kv_table th {
+  font-weight: normal;
+  text-align: left;
+  padding-right: 1em;
+  width: 40%;
+}
+
+.dedication {
+  font-style: italic;
+}
+
+span.endnote a.noteInText {
+  color: black;
+}
+
+section.cover {
+  text-align: center;
+}
+
+section.cover h2 {
+  text-align: center;
+  font-size: 21px;
+}
+
+section.cover p {
+  text-align: center;
+}
+
+section.cover h2.icl {
+  margin: 10em;
+}
+
+section.cover h1, section.cover h2 {
+  page-break-before: avoid;
+}

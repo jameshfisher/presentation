@@ -1,0 +1,124 @@
+body {
+  font-family: "Crimson";
+}
+
+#timer {
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  color: #8B743D;
+  font-style: italic;
+}
+
+.space-2 { margin: 1em 0; }
+.space-3 { margin: 2em 0 !important; }
+.space-4 { margin: 3em 0; }
+.space-5 { margin: 4em 0; }
+
+.col-2 {
+  float: left;
+  width: 48%;
+}
+
+.col-2:last-child {
+  float:right;
+}
+
+.col-3 {
+  float: left;
+  width: 30%;
+  margin-left: 3%;
+}
+
+.listTable2, .listTable3, .listTable4 {
+  padding: 0;
+}
+.listTable4 li {
+  display: inline-block;
+  text-align: center;
+  width: 24%;
+  height: 2em;
+}
+.listTable3 li {
+  display: inline-block;
+  text-align: center;
+  width: 32%;
+  height: 2em;
+}
+.listTable2 li {
+  display: inline-block;
+  text-align: center;
+  width: 49%;
+  height: 2em;
+}
+
+
+.tinyListTable {
+  font-size: 0.5em;
+}
+
+.reveal pre {
+  margin: 0;
+  width: 100%;
+  box-shadow: none;
+}
+
+code {
+  font-size: 0.8em;
+}
+
+.tinycode code {
+  font-size: 0.3em;
+  line-height: 1.2em;
+  background: none;
+  color: black;
+}
+
+.c_comment {
+  background-color: #DDE;
+  border-radius: 0.1em;
+  border-width: 0 1px 1px 0;
+  border-color: #668;
+  border-style: solid;
+  padding: 0.05em 0.2em;
+}
+
+.vf_comment {
+  background-color: #DED;
+  border-radius: 0.1em;
+  border-width: 0 1px 1px 0;
+  border-color: #686;
+  border-style: solid;
+  padding: 0.05em 0.2em;
+}
+
+.snipBlock {
+  display: inline-block;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.smallish {
+  font-size: 0.8em;
+  line-height: 1.2em;
+}
+
+.smaller {
+  font-size: 0.5em;
+  line-height: 1.2em;
+}
+
+
+.kv_table {
+  width: 100%;
+}
+.kv_table th, .kv_table td {
+  vertical-align: top;
+}
+
+.kv_table th {
+  font-weight: normal;
+  text-align: left;
+  padding-right: 1em;
+  width: 40%;
+}

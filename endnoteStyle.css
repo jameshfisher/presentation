@@ -1,0 +1,57 @@
+/* Stylesheet for use with endnotePlacement script */
+
+/* This script developed by John Blythe Dobson, j.dobson@uwinnipeg.ca */
+/* originally released May 2007 (version 1.0)                         */
+/* re-released June 2012 (version 2.0)                                */
+/* This work is licensed under a Creative Commons                     */
+/* Attribution-Noncommercial-Share Alike 3.0 License                  */
+/* (see http://creativecommons.org/licenses/by-nc-sa/3.0/)            */
+
+
+
+/*------ THIS BLOCK APPLIES TO THE NUMBERS IN THE TEXT ---------------*/
+
+span.endnote {display: inline;}
+
+/* The color of the "endnote" jumplinks is specified as blue to avoid them having the appearance of visited links, but this can be changed if desired. */
+span.endnote A {text-decoration: none; color: blue;}
+
+/* Adjust size of note numbers if desired. */
+/* This style was brought to our attention by Chris Conners and is taken from http://webdesignandsuch.com/how-to-fix-sup-sub-line-height-problem-with-css/ */
+span.endnote sub, sup {
+	font-size: 70%;
+	line-height: 0;
+	position: relative;
+	vertical-align: baseline;
+}
+sup {
+	top: -0.5em;
+}
+sub {
+	bottom: -0.25em;
+}
+
+
+
+/*-------- THIS BLOCK APPLIES TO THE ENDNOTES THEMSELVES ---------------*/
+
+/* This entry needs to match the type of heading assigned to the endnotes in the JavaScript file. H2 is the default. */
+H2.citations {text-align: center;}
+
+/* To override any existing style for OL */
+OL.citations {list-style-type: decimal;}
+
+/* This tag determines the appearance of the note number and the text of the notes. Add style here if desired. */
+OL.citations LI {}
+
+/* The color of the "goToCitation" jumplinks is specified as blue to avoid them having the appearance of visited links, but this can be changed if desired */
+A.goToCitation {font-weight: bold; text-decoration: none; color: blue;}
+
+/* To suppress the "go back to citation in text" links in the endnotes without editing the JavaScript file, add the following line to the stylesheet: */
+
+/* A.goToCitation {display: none;} */
+
+@media print
+	{
+	A.goToCitation {display: none;}
+	}

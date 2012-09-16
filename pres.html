@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+
+<title>
+Verifying
+a balanced-tree index implementation
+in VeriFast
+</title>
+<meta name="author" content="James Fisher" />
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<link href="'http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic'" rel="'stylesheet'" type="'text/css'" />
+
+<link rel="stylesheet" href="reveal.js-1.4/css/reset.css">
+
+<link rel="stylesheet" href="reveal.js-1.4/css/main.css">
+
+<link rel="stylesheet" href="reveal.js-1.4/css/print.css" type="text/css" media="print">
+
+<link rel="stylesheet" href="reveal.js-1.4/lib/css/zenburn.css">
+
+<link rel="stylesheet" href="fonts.css">
+
+<link rel="stylesheet" href="pres.css">
+
+</head>
+<body>
+<div class="reveal">
+<div class="state-background">
+</div>
+<div class="slides" id="slides">
+<section>
+<h1>
+Verifying
+a balanced-tree index implementation
+in VeriFast
+</h1>
+<p>
+James Fisher</p>
+</section>
+<section>
+<h2>
+Structure</h2>
+<div class="space-3">
+<p class="space-2 fragment">
+Introduction.
+</p>
+<p class="space-2 fragment">
+<strong>
+A verification of LLRB insert.
+</strong>
+</p>
+<p class="space-2 fragment">
+Evaluation.
+</p>
+<p class="space-2 fragment">
+Conclusion.
+</p>
+</div>
+</section>
+<section>
+<h1>
+Introduction
+</h1>
+</section>
+<section>
+<h2>
+What is verification?</h2>
+<div class="space-3">
+<p class="space-2 fragment">
+  Problem:
+<strong>
+Programs are hard to describe.
+</strong>
+</p>
+<p class="space-2 fragment">
+Solution:
+<strong>
+Formal specifications.
+</strong>
+</p>
+</div>
+<div class="space-3">
+<p class="space-2 fragment">
+Problem:
+<strong>
+Programs have bugs.
+</strong>
+</p>
+<p class="space-2 fragment">
+Solution:
+<strong>
+Proofs of correctness.
+</strong>
+</p>
+</div>
+<div class="space-3 fragment">
+<p>
+<i>
+Verification</i> =</i>
+<i>
+specification</i> +</i>
+<i>
+proof</i></i>
+</p>
+</div>
+</section>
+<section>
+<h2>
+Verification is hard!</h2>
+<div class="space-3">
+<p class="space-2 fragment">
+Laborious.
+</p>
+<p class="space-2 fragment">
+Mistakes are easy.
+</p>
+<p class="space-2 fragment">
+Divergence is easy.
+</p>
+</div>
+</section>
+<section>
+<h2>
+Separation logic to the rescue!</h2>
+<div class="space-3">
+<p class="space-2 fragment">
+Problem:
+<strong>
+Hoare-style proofs
+of heap programs
+don't scale.
+</strong>
+</p>
+<p class="space-2 fragment">
+Cause:
+<strong>
+Disjointness
+is explicit
+and non-compositional.
+</strong>
+</p>
+<p class="space-2 fragment">
+Solution:
+<strong>
+Operator
+to express disjointness.
+</strong>
+</p>
+<div class="space-2 fragment">
+<span>
+<span style="font-style: italic;">P</span><span> </span><span>∗</span><span> </span><span style="font-style: italic;">Q</span></span>
+
+</div>
+</div>
+</section>
+<section>
+<h2>
+Machines to the rescue!</h2>
+<div class="space-3 fragment">
+(Program, Spec, Proof) → Bool
+</div>
+<div class="space-3">
+<p class="space-2 fragment">
+<strong>
+Proof checking.
+</strong>
+No mistakes,
+no divergence.
+</p>
+<p class="space-2 fragment">
+<strong>
+Proof search.
+</strong>
+Shorter proofs.
+</p>
+</div>
+</section>
+<section>
+<h2>
+Verifast</h2>
+<div class="space-3">
+<p class="space-2 fragment">
+A verification assistant.
+</p>
+<p class="space-2 fragment">
+Bart Jacobs, K U Leuven, 2008+.
+</p>
+<p class="space-2 fragment">
+Basis in separation logic.
+</p>
+<p class="space-2 fragment">
+C.
+</p>
+</div>
+</section>
+
+<section>
+<h2>
+Indexes</h2>
+<div class="space-4">
+<p class="space-2 fragment">
+Key-value store.
+</p>
+<p class="space-2 fragment">
+<em>
+(Syn.: map, partial function)
+</em>
+</p>
+<p class="space-2 fragment">
+<code class="json">
+{ "james": "07951 498 897", "emergency": "999" }
+</code>
+</p>
+</div>
+</section>
+<section>
+<h2>
+Indexes are ubiquitous</h2>
+<div class="space-3">
+<p class="space-2 fragment">
+Caching.
+</p>
+<p class="space-2 fragment">
+Object storage
+(identity → attributes).
+</p>
+<p class="space-2 fragment">
+Extensionally defined functions.
+</p>
+</div>
+</section>
+<section>
+<h2>
+Index implementations are various</h2>
+<ul class="listTable listTable4 fragment tinyListTable space-3">
+<li>
+Array</li>
+<li>
+Association list</li>
+<li>
+Radix tree</li>
+<li>
+van Emde Boas tree</li>
+<li>
+Skip list</li>
+<li>
+Hash table</li>
+<li>
+Binary search tree</li>
+<li>
+Splay tree</li>
+<li>
+AVL tree</li>
+<li>
+Bloomier filter</li>
+<li>
+Red-Black Tree</li>
+<li>
+AA-tree</li>
+<li>
+LLRB-tree</li>
+<li>
+B-tree</li>
+<li>
+B<sup>+</sup>-tree</li>
+<li>
+B<sup>*</sup>-tree</li>
+<li>
+Trie</li>
+<li>
+Linked list</li>
+</ul>
+<p class="space-2 fragment">
+Different data structures
+for different use-cases.
+</p>
+</section>
+<section>
+<h2>
+Index implementations are complex</h2>
+<p class="space-2 fragment">
+Example: Red-Black Trees.
+</p>
+<p class="space-2 fragment">
+Here's the OpenJDK implementation of
+insert in all its glory …
+</p>
+<div class="space-2 fragment tinycode">
+<div class="col-3">
+<pre>
+<code class="java">
+public V put(K key, V value) {
+Entry<K,V> t = root;
+if (t == null) {
+// TBD:
+// 5045147: (coll) Adding null to an empty TreeSet should
+// throw NullPointerException
+//
+// compare(key, key); // type check
+root = new Entry<K,V>(key, value, null);
+size = 1;
+modCount++;
+return null;
+}
+int cmp;
+Entry<K,V> parent;
+// split comparator and comparable paths
+Comparator<? super K> cpr = comparator;
+if (cpr != null) {
+do {
+parent = t;
+cmp = cpr.compare(key, t.key);
+if (cmp < 0)
+t = t.left;
+else if (cmp > 0)
+t = t.right;
+else
+return t.setValue(value);
+} while (t != null);
+}
+else {
+if (key == null)
+throw new NullPointerException();
+Comparable<? super K> k = (Comparable<? super K>) key;
+do {
+parent = t;
+cmp = k.compareTo(t.key);
+if (cmp < 0)
+t = t.left;
+else if (cmp > 0)
+t = t.right;
+else
+return t.setValue(value);
+} while (t != null);
+}
+Entry<K,V> e = new Entry<K,V>(key, value, parent);
+if (cmp < 0)
+parent.left = e;
+else
+parent.right = e;
+fixAfterInsertion(e);
+size++;
+modCount++;
+return null;
+}
+</code>
+</pre>
+</div>
+<div class="col-3">
+<pre>
+<code class="java">
+private void fixAfterInsertion(Entry<K,V> x) {
+x.color = RED;
+while (x != null && x != root && x.parent.color == RED) {
+if (parentOf(x) == leftOf(parentOf(parentOf(x)))) {
+Entry<K,V> y = rightOf(parentOf(parentOf(x)));
+if (colorOf(y) == RED) {
+setColor(parentOf(x), BLACK);
+setColor(y, BLACK);
+setColor(parentOf(parentOf(x)), RED);
+x = parentOf(parentOf(x));
+} else {
+if (x == rightOf(parentOf(x))) {
+x = parentOf(x);
+rotateLeft(x);
+}
+setColor(parentOf(x), BLACK);
+setColor(parentOf(parentOf(x)), RED);
+rotateRight(parentOf(parentOf(x)));
+}
+} else {
+Entry<K,V> y = leftOf(parentOf(parentOf(x)));
+if (colorOf(y) == RED) {
+setColor(parentOf(x), BLACK);
+setColor(y, BLACK);
+setColor(parentOf(parentOf(x)), RED);
+x = parentOf(parentOf(x));
+} else {
+if (x == leftOf(parentOf(x))) {
+x = parentOf(x);
+rotateRight(x);
+}
+setColor(parentOf(x), BLACK);
+setColor(parentOf(parentOf(x)), RED);
+rotateLeft(parentOf(parentOf(x)));
+}
+}
+}
+root.color = BLACK;
+}
+</code>
+</pre>
+</div>
+<div class="col-3">
+<pre>
+<code class="java">
+private void rotateLeft(Entry<K,V> p) {
+if (p != null) {
+Entry<K,V> r = p.right;
+p.right = r.left;
+if (r.left != null)
+r.left.parent = p;
+r.parent = p.parent;
+if (p.parent == null)
+root = r;
+else if (p.parent.left == p)
+p.parent.left = r;
+else
+p.parent.right = r;
+r.left = p;
+p.parent = r;
+}
+}
+private void rotateRight(Entry<K,V> p) {
+if (p != null) {
+Entry<K,V> l = p.left;
+p.left = l.right;
+if (l.right != null) l.right.parent = p;
+l.parent = p.parent;
+if (p.parent == null)
+root = l;
+else if (p.parent.right == p)
+p.parent.right = l;
+else p.parent.left = l;
+l.right = p;
+p.parent = l;
+}
+}
+</code>
+</pre>
+</div>
+</div>
+</section>
+<section>
+<h2>
+Bugs!</h2>
+<pre>
+<code class="java">
+if (t == null) {
+// TBD:
+// 5045147: (coll) Adding null to an empty TreeSet should
+// throw NullPointerException
+//
+// compare(key, key); // type check
+</code>
+</pre>
+</section>
+<section>
+<h2>
+Left-Leaning Red-Black Trees</h2>
+<p class="space-2 fragment">
+Variant of Red-Black Trees.
+</p>
+<p class="space-2 fragment">
+Introduced by Robert Sedgwick
+in 2008.
+</p>
+<p class="space-2 fragment">
+Imposes more constraints
+on the data structure.
+</p>
+<p class="space-2 fragment">
+Algorithms become simpler.
+</p>
+<p class="space-2 fragment">
+Retains the spirit of
+the Red-Black Tree algorithms.
+</p>
+</section>
+
+<section>
+<h2>
+Project goal</h2>
+<p class="space-4">
+<span class="fragment">
+Use VeriFast<br /></span>
+<span class="fragment">
+to specify and verify<br /></span>
+<span class="fragment">
+a C implementation of<br /></span>
+<span class="fragment">
+Left-Leaning Red-Black Trees.</span>
+</p>
+</section>
+
+<section>
+<h1>
+Verifying LLRB insert
+</h1>
+</section>
+<section>
+<h2>
+A set-theoretical index definition</h2>
+<p class="space-2 fragment">
+<b>
+Index</b>, <i>n</i>.:</b>
+a set
+of pairs
+with unique first elements.
+</p>
+<p class="space-4 fragment">
+This needs a bit of work
+for VeriFast to understand.
+</p>
+</section>
+<section>
+<h2>
+Pairs</h2>
+<p class="space-2">
+<b>
+Index</b>, <i>n</i>.:</b>
+a set
+of <em>pairs</em>
+with unique first elements.
+</p>
+<div class="space-3">
+<p class="space-2 fragment">
+So we need a data type for pairs.
+In VeriFast we write:
+</p>
+<div class="space-2 fragment">
+<div class="snipBlock">
+<div>
+<div style="padding-left:0.0em;"><span style="font-weight:bold;">inductive</span><span> </span><span style="font-style: italic;">Pair</span><span>&lt;</span><span style="font-style: italic;">K</span><span>,</span><span style="font-style: italic;">V</span><span>&gt;</span><span> </span><span>=</span><span> </span><span style="font-style: italic;">Pair</span><span>(</span><span style="font-style: italic;">K</span><span>,</span><span style="font-style: italic;">V</span><span>)</span><span>;</span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+</div>
+</div>
+<div class="space-3 fragment">
+<p class="space-2">
+Read it like the Haskell:
+</p>
+<p class="space-2">
+<b>
+data</b> Pair <i>k</i> <i>v</i> = Pair <i>k</i> <i>v</i></b>
+</p>
+</div>
+</section>
+<section>
+<h2>
+Sets …?</h2>
+<p class="space-2">
+<b>
+Index</b>, <i>n</i>.:</b>
+a <em>set</em>
+of pairs
+with unique first elements.
+</p>
+<p class="space-2 fragment">
+How do we represent a set
+with algebraic data types?
+</p>
+<p class="space-2 fragment">
+Algebraic data types impose an <em>ordering</em>.
+</p>
+<p class="space-2 fragment">
+The best we can do are <em>lists</em>.
+</p>
+<div class="space-2 fragment">
+<div class="snipBlock">
+<div>
+<div style="padding-left:0.0em;"><span style="font-weight:bold;">inductive</span><span> </span><span style="font-style: italic;">List</span><span>&lt;</span><span style="font-style: italic;">T</span><span>&gt;</span><span> </span><span>=</span><br></div><div style="padding-left:1.0em;"><span>│</span><span> </span><span style="font-style: italic;">Nil</span><br></div><div style="padding-left:1.0em;"><span>│</span><span> </span><span style="font-style: italic;">Cons</span><span>(</span><span style="font-style: italic;">T</span><span>,</span><span> </span><span style="font-style: italic;">List</span><span>&lt;</span><span style="font-style: italic;">T</span><span>&gt;</span><span>)</span><span>;</span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+</div>
+</section>
+<section>
+<h2>
+Unique keys</h2>
+<p class="space-2">
+<b>
+Index</b>, <i>n</i>.:</b>
+a list
+of pairs
+with <em>unique first elements</em>.
+</p>
+<p class="space-2">
+<span class="fragment">
+Is uniqueness enough?</span>
+<span class="fragment">
+<strong>
+No …
+</strong>
+</span>
+</p>
+<div class="space-3">
+<p class="space-2 fragment">
+{ 1:<q>a</q>, 2:<q>b</q>, 3:<q>c</q> } = { 2:<q>b</q>, 1:<q>a</q>, 3:<q>c</q> }
+</p>
+<p class="space-2 fragment">
+[(1,<q>a</q>), (2,<q>b</q>), (3,<q>c</q>)] ≠ [(2,<q>b</q>), (1,<q>a</q>), (3,<q>c</q>)]
+</p>
+</div>
+<div class="space-3">
+<p class="space-2 fragment">
+We want a <em>canonical</em> ordering:
+<strong>
+sortedness!</strong></strong>
+</p>
+<p class="space-2 fragment">
+Then [(2,<q>b</q>), (1,<q>a</q>), (3,<q>c</q>)]
+is simply not an index.
+</p>
+</div>
+</section>
+<section>
+<h2>
+Sortedness</h2>
+<p class="space-2">
+<b>
+Index</b>, <i>n</i>.:</b>
+a list
+of pairs
+<em>
+sorted by first elements</em>.</em>
+</p>
+<div class="space-3">
+<div class="fragment snipBlock smaller col-2">
+<div>
+<div style="padding-left:0.0em;"><span style="font-weight:bold;">fixpoint</span><span> </span><span style="font-weight:bold;">bool</span><span> </span><span style="font-style: italic;">lowerBound</span><span>&lt;</span><span style="font-style: italic;">V</span><span>&gt;</span><span>(</span><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">lb</span><span>,</span><span> </span><span style="font-style: italic;">List</span><span>&lt;</span><span style="font-style: italic;">Pair</span><span>&lt;</span><span style="font-weight:bold;">int</span><span>,</span><span style="font-style: italic;">V</span><span>&gt;</span><span> </span><span>&gt;</span><span> </span><span style="font-style: italic;">I</span><sub>0</sub><span>)</span><span> </span><span>{</span><br></div><div style="padding-left:1.0em;"><span style="font-weight:bold;">switch</span><span> </span><span>(</span><span style="font-style: italic;">I</span><sub>0</sub><span>)</span><span> </span><span>{</span><br></div><div style="padding-left:2.0em;"><span style="font-weight:bold;">case</span><span> </span><span style="font-style: italic;">Nil</span><span>:</span><span> </span><span style="font-weight:bold;">return</span><span> </span><span style="font-weight:bold;">true</span><span>;</span><br></div><div style="padding-left:2.0em;"><span style="font-weight:bold;">case</span><span> </span><span style="font-style: italic;">Cons</span><span>(</span><span style="font-style: italic;">e</span><sub>0</sub><span>,</span><span> </span><span style="font-style: italic;">I</span><sub>1</sub><span>)</span><span>:</span><br></div><div style="padding-left:3.0em;"><span style="font-weight:bold;">return</span><span> </span><span style="font-weight:bold;">switch</span><span> </span><span>(</span><span style="font-style: italic;">e</span><sub>0</sub><span>)</span><span> </span><span>{</span><br></div><div style="padding-left:4.0em;"><span style="font-weight:bold;">case</span><span> </span><span style="font-style: italic;">Pair</span><span>(</span><span style="font-style: italic;">k</span><sub>0</sub><span>,</span><span> </span><span style="font-style: italic;">v</span><sub>0</sub><span>)</span><span>:</span><span> </span><span style="font-weight:bold;">return</span><br></div><div style="padding-left:5.0em;"><span style="font-style: italic;">lb</span><span> </span><span>&lt;</span><span> </span><span style="font-style: italic;">k</span><sub>0</sub><span> </span><span>∧</span><br></div><div style="padding-left:5.0em;"><span style="font-style: italic;">lowerBound</span><span>(</span><span style="font-style: italic;">lb</span><span>,</span><span> </span><span style="font-style: italic;">I</span><sub>1</sub><span>)</span><span>;</span><br></div><div style="padding-left:3.0em;"><span>}</span><span>;</span><br></div><div style="padding-left:1.0em;"><span>}</span><br></div><div style="padding-left:0.0em;"><span>}</span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+<div class="fragment snipBlock smaller col-2">
+<div>
+<div style="padding-left:0.0em;"><span style="font-weight:bold;">fixpoint</span><span> </span><span style="font-weight:bold;">bool</span><span> </span><span style="font-style: italic;">sorted</span><span>&lt;</span><span style="font-style: italic;">V</span><span>&gt;</span><span>(</span><span style="font-style: italic;">List</span><span>&lt;</span><span style="font-style: italic;">Pair</span><span>&lt;</span><span style="font-weight:bold;">int</span><span>,</span><span style="font-style: italic;">V</span><span>&gt;</span><span> </span><span>&gt;</span><span> </span><span style="font-style: italic;">I</span><sub>0</sub><span>)</span><span> </span><span>{</span><br></div><div style="padding-left:1.0em;"><span style="font-weight:bold;">switch</span><span> </span><span>(</span><span style="font-style: italic;">I</span><sub>0</sub><span>)</span><span> </span><span>{</span><br></div><div style="padding-left:2.0em;"><span style="font-weight:bold;">case</span><span> </span><span style="font-style: italic;">Nil</span><span>:</span><span> </span><span style="font-weight:bold;">return</span><span> </span><span style="font-weight:bold;">true</span><span>;</span><br></div><div style="padding-left:2.0em;"><span style="font-weight:bold;">case</span><span> </span><span style="font-style: italic;">Cons</span><span>(</span><span style="font-style: italic;">e</span><sub>0</sub><span>,</span><span> </span><span style="font-style: italic;">I</span><sub>1</sub><span>)</span><span>:</span><br></div><div style="padding-left:3.0em;"><span style="font-weight:bold;">return</span><span> </span><span style="font-weight:bold;">switch</span><span> </span><span>(</span><span style="font-style: italic;">e</span><sub>0</sub><span>)</span><span> </span><span>{</span><br></div><div style="padding-left:4.0em;"><span style="font-weight:bold;">case</span><span> </span><span style="font-style: italic;">Pair</span><span>(</span><span style="font-style: italic;">k</span><sub>0</sub><span>,</span><span> </span><span style="font-style: italic;">v</span><sub>0</sub><span>)</span><span>:</span><span> </span><span style="font-weight:bold;">return</span><br></div><div style="padding-left:5.0em;"><span style="font-style: italic;">lowerBound</span><span>(</span><span style="font-style: italic;">k</span><sub>0</sub><span>,</span><span> </span><span style="font-style: italic;">I</span><sub>1</sub><span>)</span><span> </span><span>∧</span><br></div><div style="padding-left:5.0em;"><span style="font-style: italic;">sorted</span><span>(</span><span style="font-style: italic;">I</span><sub>1</sub><span>)</span><span>;</span><br></div><div style="padding-left:3.0em;"><span>}</span><span>;</span><br></div><div style="padding-left:1.0em;"><span>}</span><br></div><div style="padding-left:0.0em;"><span>}</span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+</div>
+</section>
+<section>
+<h2>
+VeriFast Index definition</h2>
+<p class="space-2">
+<b>
+Index</b>, <i>n</i>.:</b>
+a list
+of pairs
+sorted by first elements.
+</p>
+<div class="space-3">
+<p class="space-2 fragment">
+An index <span>
+<span style="font-style: italic;">I</span></span>
+,
+from <i>K</i>s to <i>V</i>s,
+is …
+</p>
+<p class="space-2 fragment">
+of type <span>
+<span style="font-style: italic;">List</span><span>&lt;</span><span style="font-style: italic;">Pair</span><span>&lt;</span><span style="font-weight:bold;">int</span><span>,</span><span style="font-style: italic;">V</span><span>&gt;</span><span> </span><span>&gt;</span></span>
+
+</p>
+<p class="space-2 fragment">
+where <span>
+<span style="font-style: italic;">sorted</span><span>(</span><span style="font-style: italic;">I</span><span>)</span><span> </span><span>==</span><span> </span><span style="font-weight:bold;">true</span></span>
+.
+</p>
+</div>
+</section>
+
+<section>
+<h2>
+Binary Search Tree</h2>
+<p class="space-2 fragment">
+The LLRB is an augmented Binary Search Tree.
+</p>
+<p class="space-2 fragment">
+Single extra field on node:
+colored red or black.
+</p>
+<p class="space-2 fragment">
+<img src="diagrams/llrb/example.svg" />
+
+</p>
+</section>
+<section>
+<h2>
+Definition in C</h2>
+<div class="space-2">
+<div class="fragment col-2">
+<div class="snipBlock">
+<div>
+<div style="padding-left:0.0em;"><span style="font-weight:bold;">struct</span><span> </span><span style="font-style: italic;">TreeNode</span><span> </span><span>{</span><br></div><div style="padding-left:1.0em;"><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">key</span><span>;</span><br></div><div style="padding-left:1.0em;"><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">value</span><span>;</span><br></div><div style="padding-left:1.0em;"><span style="font-style: italic;">Color</span><span> </span><span style="font-style: italic;">color</span><span>;</span><br></div><div style="padding-left:1.0em;"><span style="font-style: italic;">TreeNode</span><span> </span><span>*</span><span> </span><span style="font-style: italic;">lft</span><span>;</span><br></div><div style="padding-left:1.0em;"><span style="font-style: italic;">TreeNode</span><span> </span><span>*</span><span> </span><span style="font-style: italic;">rgt</span><span>;</span><br></div><div style="padding-left:0.0em;"><span>}</span><span>;</span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+</div>
+<div class="col-2">
+<p class="fragment">
+The C datatype
+doesn't tell us much about
+how <span>
+<span style="font-style: italic;">TreeNode</span></span>
+ values are used.
+</p>
+<p class="fragment">
+Are the pointers valid?
+</p>
+<p class="fragment">
+Are the nodes even connected as a tree?
+</p>
+</div>
+</div>
+</section>
+<section>
+<h2>
+Trees in VeriFast</h2>
+<p class="space-2">
+Algebraic data types to the rescue!
+</p>
+<div class="fragment snipBlock space-2">
+<div>
+<div style="padding-left:0.0em;"><span style="font-weight:bold;">inductive</span><span> </span><span style="font-style: italic;">Tree</span><span>&lt;</span><span style="font-style: italic;">K</span><span>,</span><span style="font-style: italic;">V</span><span>&gt;</span><span> </span><span>=</span><br></div><div style="padding-left:1.0em;"><span>│</span><span> </span><span style="font-style: italic;">Leaf</span><br></div><div style="padding-left:1.0em;"><span>│</span><span> </span><span style="font-style: italic;">Branch</span><span>(</span><span style="font-style: italic;">Tree</span><span>&lt;</span><span style="font-style: italic;">K</span><span>,</span><span style="font-style: italic;">V</span><span>&gt;</span><span>,</span><span> </span><span style="font-style: italic;">K</span><span>,</span><span> </span><span style="font-style: italic;">V</span><span>,</span><span> </span><span style="font-style: italic;">Color</span><span>,</span><span> </span><span style="font-style: italic;">Tree</span><span>&lt;</span><span style="font-style: italic;">K</span><span>,</span><span style="font-style: italic;">V</span><span>&gt;</span><span>)</span><span>;</span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+<p class="space-2 fragment">
+These are definitely trees!
+</p>
+</section>
+<section>
+<h2>
+Trees in C?</h2>
+<p class="space-2 fragment">
+How do we link
+the C data type
+with the VeriFast tree?
+</p>
+<div class="snipBlock space-2 fragment smallish">
+<div>
+<div style="padding-left:0.0em;"><span style="font-weight:bold;">predicate</span><span> </span><span style="font-style: italic;">IsTree</span><span>(</span><span style="font-style: italic;">TreeNodePtr</span><span> </span><span style="font-style: italic;">root</span><span>;</span><span> </span><span style="font-style: italic;">Tree</span><span>&lt;</span><span style="font-weight:bold;">int</span><span>,</span><span style="font-weight:bold;">int</span><span>&gt;</span><span> </span><span style="font-style: italic;">tree</span><span>)</span><span> </span><span>=</span><br></div><div style="padding-left:1.0em;"><span style="font-style: italic;">root</span><span> </span><span>==</span><span> </span><span>0</span><span> </span><span>?</span><br></div><div style="padding-left:2.0em;"><span style="font-style: italic;">tree</span><span> </span><span>==</span><span> </span><span style="font-style: italic;">Leaf</span><br></div><div style="padding-left:1.0em;"><span>:</span><br></div><div style="padding-left:2.0em;"><span style="font-style: italic;">root</span><span>-</span><span>&gt;</span><span style="font-style: italic;">key</span><span> </span><span>↦</span><span> </span><span>?</span><span style="font-style: italic;">key</span><span> </span><span>∗</span><br></div><div style="padding-left:2.0em;"><span style="font-style: italic;">root</span><span>-</span><span>&gt;</span><span style="font-style: italic;">value</span><span> </span><span>↦</span><span> </span><span>?</span><span style="font-style: italic;">value</span><span> </span><span>∗</span><br></div><div style="padding-left:2.0em;"><span style="font-style: italic;">root</span><span>-</span><span>&gt;</span><span style="font-style: italic;">color</span><span> </span><span>↦</span><span> </span><span>?</span><span style="font-style: italic;">color</span><span> </span><span>∗</span><br></div><div style="padding-left:2.0em;"><span style="font-style: italic;">root</span><span>-</span><span>&gt;</span><span style="font-style: italic;">lft</span><span> </span><span>↦</span><span> </span><span>?</span><span style="font-style: italic;">lft</span><span> </span><span>∗</span><br></div><div style="padding-left:2.0em;"><span style="font-style: italic;">root</span><span>-</span><span>&gt;</span><span style="font-style: italic;">rgt</span><span> </span><span>↦</span><span> </span><span>?</span><span style="font-style: italic;">rgt</span><span> </span><span>∗</span><br></div><div style="padding-left:2.0em;"><span style="font-style: italic;">malloc_block_TreeNode</span><span>(</span><span style="font-style: italic;">root</span><span>)</span><span> </span><span>∗</span><br></div><div style="padding-left:2.0em;"><span style="font-style: italic;">IsTree</span><span>(</span><span style="font-style: italic;">lft</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">lftTree</span><span>)</span><span> </span><span>∗</span><br></div><div style="padding-left:2.0em;"><span style="font-style: italic;">IsTree</span><span>(</span><span style="font-style: italic;">rgt</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">rgtTree</span><span>)</span><span> </span><span>∗</span><br></div><div style="padding-left:2.0em;"><span style="font-style: italic;">tree</span><span> </span><span>==</span><span> </span><span style="font-style: italic;">Branch</span><span>(</span><span style="font-style: italic;">lftTree</span><span>,</span><span> </span><span style="font-style: italic;">key</span><span>,</span><span> </span><span style="font-style: italic;">value</span><span>,</span><span> </span><span style="font-style: italic;">color</span><span>,</span><span> </span><span style="font-style: italic;">rgtTree</span><span>)</span><br></div><div style="padding-left:1.0em;"><span>;</span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+</section>
+<section>
+<h2>
+How is this an index?</h2>
+<p class="space-2 fragment">
+We need to relate this to our index definition.
+</p>
+<div class="snipBlock space-2 smallish fragment">
+<div>
+<div style="padding-left:0.0em;"><span style="font-weight:bold;">fixpoint</span><span> </span><span style="font-style: italic;">List</span><span>&lt;</span><span style="font-style: italic;">Pair</span><span>&lt;</span><span style="font-style: italic;">K</span><span>,</span><span style="font-style: italic;">V</span><span>&gt;</span><span> </span><span>&gt;</span><span> </span><span style="font-style: italic;">flatten</span><span>&lt;</span><span style="font-style: italic;">K</span><span>,</span><span style="font-style: italic;">V</span><span>&gt;</span><span>(</span><span style="font-style: italic;">Tree</span><span>&lt;</span><span style="font-style: italic;">K</span><span>,</span><span style="font-style: italic;">V</span><span>&gt;</span><span> </span><span style="font-style: italic;">t</span><span>)</span><span> </span><span>{</span><br></div><div style="padding-left:1.0em;"><span style="font-weight:bold;">switch</span><span> </span><span>(</span><span style="font-style: italic;">t</span><span>)</span><span> </span><span>{</span><br></div><div style="padding-left:2.0em;"><span style="font-weight:bold;">case</span><span> </span><span style="font-style: italic;">Leaf</span><span>:</span><span> </span><span style="font-weight:bold;">return</span><span> </span><span style="font-style: italic;">Nil</span><span>;</span><br></div><div style="padding-left:2.0em;"><span style="font-weight:bold;">case</span><span> </span><span style="font-style: italic;">Branch</span><span>(</span><span style="font-style: italic;">l</span><span>,</span><span> </span><span style="font-style: italic;">k</span><span>,</span><span> </span><span style="font-style: italic;">v</span><span>,</span><span> </span><span style="font-style: italic;">c</span><span>,</span><span> </span><span style="font-style: italic;">r</span><span>)</span><span>:</span><span> </span><span style="font-weight:bold;">return</span><span> </span><span style="font-style: italic;">append</span><span>(</span><span style="font-style: italic;">flatten</span><span>(</span><span style="font-style: italic;">l</span><span>)</span><span>,</span><span> </span><span style="font-style: italic;">Cons</span><span>(</span><span style="font-style: italic;">Pair</span><span>(</span><span style="font-style: italic;">k</span><span>,</span><span style="font-style: italic;">v</span><span>)</span><span>,</span><span> </span><span style="font-style: italic;">flatten</span><span>(</span><span style="font-style: italic;">r</span><span>)</span><span>)</span><span>)</span><span>;</span><br></div><div style="padding-left:1.0em;"><span>}</span><br></div><div style="padding-left:0.0em;"><span>}</span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+<p class="space-2 fragment">
+Notice that binary search ordering
+is simply given by <span>
+<span style="font-style: italic;">sorted</span><span>(</span><span style="font-style: italic;">flatten</span><span>(</span><span style="font-style: italic;">T</span><span>)</span><span>)</span></span>
+!
+</p>
+</section>
+<section>
+<h2>
+Black rule</h2>
+<p class="space-2 fragment">
+Rule:
+<em>
+All paths from the root to a leaf
+must contain the same number of black nodes.
+</em>
+</p>
+<p class="space-2 fragment">
+Then we can define a tree's
+<q>
+black height</q>.</q>
+</p>
+<p class="space-2 fragment">
+<img src="diagrams/llrb/BlackRule_example.svg" />
+
+</p>
+</section>
+<section>
+<h2>
+Red rule</h2>
+<p class="space-2 fragment">
+Rule:
+<em>
+All local color triples
+must be one of:
+</em>
+</p>
+<p class="space-2 fragment">
+<img src="diagrams/llrb/RedRule.svg" />
+
+</p>
+<p class="space-2 fragment">
+(Leaf nodes are considered black,
+and the whole tree has a black root)
+</p>
+</section>
+<section>
+<h2>
+Black and red rules in VeriFast</h2>
+<div class="space-3 snipBlock fragment smallish">
+<div>
+<div style="padding-left:0.0em;"><span style="font-weight:bold;">predicate</span><span> </span><span style="font-style: italic;">IsLLRB</span><span>&lt;</span><span style="font-style: italic;">K</span><span>,</span><span style="font-style: italic;">V</span><span>&gt;</span><span>(</span><span style="font-style: italic;">Tree</span><span>&lt;</span><span style="font-style: italic;">K</span><span>,</span><span style="font-style: italic;">V</span><span>&gt;</span><span> </span><span style="font-style: italic;">t</span><span>;</span><span> </span><span style="font-style: italic;">Color</span><span> </span><span style="font-style: italic;">c</span><span>,</span><span> </span><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">h</span><span>)</span><span> </span><span>=</span><br></div><div style="padding-left:1.0em;"><span style="font-weight:bold;">switch</span><span> </span><span>(</span><span style="font-style: italic;">t</span><span>)</span><span> </span><span>{</span><br></div><div style="padding-left:2.0em;"><span style="font-weight:bold;">case</span><span> </span><span style="font-style: italic;">Leaf</span><span>:</span><span> </span><span style="font-weight:bold;">return</span><br></div><div style="padding-left:3.0em;"><span style="font-style: italic;">h</span><span> </span><span>==</span><span> </span><span>0</span><span> </span><span>∗</span><br></div><div style="padding-left:3.0em;"><span style="font-style: italic;">c</span><span> </span><span>==</span><span> </span><span style="font-style: italic;">Blk</span><span>;</span><br></div><div style="padding-left:2.0em;"><span style="font-weight:bold;">case</span><span> </span><span style="font-style: italic;">Branch</span><span>(</span><span style="font-style: italic;">l</span><span>,</span><span> </span><span style="font-style: italic;">k</span><span>,</span><span> </span><span style="font-style: italic;">v</span><span>,</span><span> </span><span style="font-style: italic;">c</span><span>′</span><span>,</span><span> </span><span style="font-style: italic;">r</span><span>)</span><span>:</span><span> </span><span style="font-weight:bold;">return</span><br></div><div style="padding-left:3.0em;"><span style="font-style: italic;">c</span><span> </span><span>==</span><span> </span><span style="font-style: italic;">c</span><span>′</span><span> </span><span>∗</span><br></div><div style="padding-left:3.0em;"><span style="font-style: italic;">IsLLRB</span><span>(</span><span style="font-style: italic;">l</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">lftC</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">subH</span><span>)</span><span> </span><span>∗</span><br></div><div style="padding-left:3.0em;"><span style="font-style: italic;">IsLLRB</span><span>(</span><span style="font-style: italic;">r</span><span>,</span><span> </span><span style="font-style: italic;">Blk</span><span>,</span><span> </span><span style="font-style: italic;">subH</span><span>)</span><span> </span><span>∗</span><br></div><div style="padding-left:3.0em;"><span>(</span><span> </span><span style="font-style: italic;">c</span><span> </span><span>==</span><span> </span><span style="font-style: italic;">Red</span><span> </span><span>?</span><span> </span><span style="font-style: italic;">h</span><span> </span><span>==</span><span> </span><span style="font-style: italic;">subH</span><span> </span><span>∗</span><span> </span><span style="font-style: italic;">lftC</span><span> </span><span>==</span><span> </span><span style="font-style: italic;">Blk</span><br></div><div style="padding-left:3.0em;"><span>:</span><span> </span><span style="font-style: italic;">c</span><span> </span><span>==</span><span> </span><span style="font-style: italic;">Blk</span><span> </span><span>∗</span><span> </span><span style="font-style: italic;">h</span><span> </span><span>==</span><span> </span><span style="font-style: italic;">subH</span><span>+</span><span>1</span><span>)</span><span>;</span><br></div><div style="padding-left:1.0em;"><span>}</span><span>;</span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+</section>
+<section>
+<h2>
+The LLRB is balanced</h2>
+<p class="space-2 fragment">
+The longest path to a leaf
+is no more than twice the shortest.
+</p>
+<p class="space-2 fragment">
+<img src="diagrams/llrb/balance.svg" />
+
+</p>
+<p class="space-2 fragment">
+(I've proved this in VeriFast,
+but we don't have time for it!)
+</p>
+</section>
+
+<section>
+<h2>
+Index insert</h2>
+<p class="space-2 fragment">
+I define insertion in terms of search:
+</p>
+<div class="fragment snipBlock space-2 smallish">
+<div>
+<div style="padding-left:0.0em;"><span style="font-weight:bold;">lemma</span><span> </span><span style="font-weight:bold;">void</span><span> </span><span style="font-style: italic;">index_insert_proof</span><span>&lt;</span><span style="font-style: italic;">V</span><span>&gt;</span><span>(</span><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">k</span><span>,</span><span> </span><span style="font-style: italic;">V</span><span> </span><span style="font-style: italic;">v</span><span>,</span><span> </span><span style="font-style: italic;">List</span><span>&lt;</span><span style="font-style: italic;">Pair</span><span>&lt;</span><span style="font-weight:bold;">int</span><span>,</span><span style="font-style: italic;">V</span><span>&gt;</span><span> </span><span>&gt;</span><span> </span><span style="font-style: italic;">I</span><sub>0</sub><span>,</span><span> </span><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">kn</span><span>)</span><span>;</span><br></div><div style="padding-left:1.0em;"><span style="font-weight:bold;">requires</span><span> </span><span style="font-style: italic;">sorted</span><span>(</span><span style="font-style: italic;">I</span><sub>0</sub><span>)</span><span> </span><span>==</span><span> </span><span style="font-weight:bold;">true</span><span>;</span><br></div><div style="padding-left:1.0em;"><span style="font-weight:bold;">ensures</span><span> </span><span style="font-style: italic;">index_search</span><span>(</span><span style="font-style: italic;">kn</span><span>,</span><span> </span><span style="font-style: italic;">index_insert</span><span>(</span><span style="font-style: italic;">k</span><span>,</span><span> </span><span style="font-style: italic;">v</span><span>,</span><span> </span><span style="font-style: italic;">I</span><sub>0</sub><span>)</span><span>)</span><span> </span><span>==</span><span> </span><span>(</span><span style="font-style: italic;">kn</span><span> </span><span>==</span><span> </span><span style="font-style: italic;">k</span><span> </span><span>?</span><span> </span><span style="font-style: italic;">Just</span><span>(</span><span style="font-style: italic;">v</span><span>)</span><span> </span><span>:</span><span> </span><span style="font-style: italic;">index_search</span><span>(</span><span style="font-style: italic;">kn</span><span>,</span><span> </span><span style="font-style: italic;">I</span><sub>0</sub><span>)</span><span>)</span><span>;</span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+<p class="space-2 fragment">
+Require
+<span>
+<span style="font-style: italic;">index_search</span></span>
+ and <span>
+<span style="font-style: italic;">index_insert</span></span>
+
+for which this holds.
+</p>
+<p class="space-2 fragment">
+(No time!)
+</p>
+</section>
+<section>
+<h2>
+C insert procedures</h2>
+<p class="space-2 fragment">
+LLRB insert has
+two mutually recursive procedures.
+</p>
+<div class="space-2 fragment">
+<div class="snipBlock">
+<div>
+<div style="padding-left:0.0em;"><span style="font-weight:bold;">bool</span><span> </span><span style="font-style: italic;">llrb_insert_R</span><span>(</span><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">key</span><span>,</span><span> </span><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">value</span><span>,</span><span> </span><span style="font-style: italic;">TreeNodePtr</span><span> </span><span>*</span><span> </span><span style="font-style: italic;">rootptr</span><span>)</span><span>;</span><br></div><div style="padding-left:0.0em;"><span style="font-weight:bold;">bool</span><span> </span><span style="font-style: italic;">llrb_insert_B</span><span>(</span><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">key</span><span>,</span><span> </span><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">value</span><span>,</span><span> </span><span style="font-style: italic;">TreeNodePtr</span><span> </span><span>*</span><span> </span><span style="font-style: italic;">rootptr</span><span>)</span><span>;</span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+</div>
+<p class="space-2 fragment">
+<span>
+<span style="font-style: italic;">llrb_insert_R</span></span>
+ inserts into a red-rooted tree.
+</p>
+<p class="space-2 fragment">
+Positive return value indicates the tree needs <q>fixing</q>.
+</p>
+</section>
+<section>
+<h2>
+Contracts</h2>
+<p class="space-2 fragment">
+Just looking at <span>
+<span style="font-style: italic;">llrb_insert_B</span></span>
+
+(the first procedure to be called).
+</p>
+<div class="space-2 fragment">
+<div class="snipBlock smallish">
+<div>
+<div style="padding-left:0.0em;"><span style="font-weight:bold;">bool</span><span> </span><span style="font-style: italic;">llrb_insert_B</span><span>(</span><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">key</span><span>,</span><span> </span><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">value</span><span>,</span><span> </span><span style="font-style: italic;">TreeNodePtr</span><span> </span><span>*</span><span> </span><span style="font-style: italic;">rootptr</span><span>)</span><span>;</span><br></div><div style="padding-left:0.0em;"><span class="vf_comment"><span style="font-weight:bold;">requires</span><span> </span><span style="font-weight:bold;">pointer</span><span>(</span><span style="font-style: italic;">rootptr</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">root</span><sub>0</sub><span>)</span><span> </span><span>∗</span><span> </span><span style="font-style: italic;">IsTree</span><span>(</span><span style="font-style: italic;">root</span><sub>0</sub><span>,</span><span> </span><span>?</span><span style="font-style: italic;">t</span><sub>0</sub><span>)</span><span> </span><span>∗</span><span> </span><span style="font-style: italic;">sorted</span><span>(</span><span style="font-style: italic;">flatten</span><span>(</span><span style="font-style: italic;">t</span><sub>0</sub><span>)</span><span>)</span><span> </span><span>==</span><span> </span><span style="font-weight:bold;">true</span><span> </span><span>∗</span><span> </span><span style="font-style: italic;">IsLLRB</span><span>(</span><span style="font-style: italic;">t</span><sub>0</sub><span>,</span><span> </span><span style="font-style: italic;">Blk</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">h</span><span>)</span><span>;</span></span><br></div><div style="padding-left:0.0em;"><span class="vf_comment"><span style="font-weight:bold;">ensures</span><span> </span><span style="font-weight:bold;">pointer</span><span>(</span><span style="font-style: italic;">rootptr</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">root</span><sub>1</sub><span>)</span><span> </span><span>∗</span><span> </span><span style="font-style: italic;">IsTree</span><span>(</span><span style="font-style: italic;">root</span><sub>1</sub><span>,</span><span> </span><span>?</span><span style="font-style: italic;">t</span><sub>1</sub><span>)</span><span> </span><span>∗</span><span> </span><span style="font-style: italic;">IsLLRB</span><span>(</span><span style="font-style: italic;">t</span><sub>1</sub><span>,</span><span> </span><span style="font-style: italic;">result</span><span> </span><span>?</span><span> </span><span style="font-style: italic;">Red</span><span> </span><span>:</span><span> </span><span style="font-style: italic;">Blk</span><span>,</span><span> </span><span style="font-style: italic;">h</span><span>)</span><span> </span><span>∗</span><span> </span><span style="font-style: italic;">flatten</span><span>(</span><span style="font-style: italic;">t</span><sub>1</sub><span>)</span><span> </span><span>==</span><span> </span><span style="font-style: italic;">index_insert</span><span>(</span><span style="font-style: italic;">key</span><span>,</span><span> </span><span style="font-style: italic;">value</span><span>,</span><span> </span><span style="font-style: italic;">flatten</span><span>(</span><span style="font-style: italic;">t</span><sub>0</sub><span>)</span><span>)</span><span>;</span></span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+</div>
+<table class="space-2 kv_table smallish fragment">
+<tr>
+<th>
+<span>
+<span style="font-weight:bold;">pointer</span><span>(</span><span style="font-style: italic;">rootptr</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">root</span><sub>0</sub><span>)</span></span>
+
+</th>
+<td>
+A single-cell heap chunk
+with address <span>
+<span style="font-style: italic;">rootptr</span></span>
+
+and some value <span>
+<span style="font-style: italic;">root</span><sub>0</sub></span>
+
+</td>
+</tr>
+<tr>
+<th>
+<span>
+<span style="font-style: italic;">IsLLRB</span><span>(</span><span style="font-style: italic;">t</span><sub>1</sub><span>,</span><span> </span><span style="font-style: italic;">result</span><span> </span><span>?</span><span> </span><span style="font-style: italic;">Red</span><span> </span><span>:</span><span> </span><span style="font-style: italic;">Blk</span><span>,</span><span> </span><span style="font-style: italic;">h</span><span>)</span><span> </span></span>
+
+</th>
+<td>
+If the procedure returns <span>
+<span style="font-weight:bold;">true</span></span>
+
+then the new tree <span>
+<span style="font-style: italic;">t</span><sub>1</sub></span>
+
+is red-rooted.
+</td>
+</tr>
+</table>
+</section>
+
+<section>
+<h2>
+A bit of the procedure …</h2>
+<div class="space-2">
+<div class="fragment col-2">
+<div class="snipBlock smaller">
+<div>
+<div style="padding-left:0.0em;"><span style="font-weight:bold;">bool</span><span> </span><span style="font-style: italic;">llrb_insert_B</span><span>(</span><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">key</span><span>,</span><span> </span><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">value</span><span>,</span><span> </span><span style="font-style: italic;">TreeNodePtr</span><span> </span><span>*</span><span> </span><span style="font-style: italic;">rootptr</span><span>)</span><br></div><div style="padding-left:0.0em;"><span>{</span><br></div><div style="padding-left:1.0em;"><span style="font-style: italic;">TreeNodePtr</span><span> </span><span style="font-style: italic;">root</span><span> </span><span>=</span><span> </span><span>*</span><span style="font-style: italic;">rootptr</span><span>;</span><br></div><div style="padding-left:1.0em;"><br></div><div style="padding-left:1.0em;"><span style="font-weight:bold;">if</span><span> </span><span>(</span><span style="font-style: italic;">root</span><span> </span><span>==</span><span> </span><span>0</span><span>)</span><span> </span><span>{</span><span> </span><span>…</span><span> </span><span>}</span><br></div><div style="padding-left:1.0em;"><span style="font-weight:bold;">else</span><span> </span><span>{</span><br></div><div style="padding-left:2.0em;"><span style="font-weight:bold;">int</span><span> </span><span style="font-style: italic;">k</span><span> </span><span>=</span><span> </span><span style="font-style: italic;">root</span><span>-</span><span>&gt;</span><span style="font-style: italic;">key</span><span>;</span><br></div><div style="padding-left:1.0em;"><br></div><div style="padding-left:2.0em;"><span style="font-weight:bold;">if</span><span> </span><span>(</span><span style="font-style: italic;">key</span><span> </span><span>==</span><span> </span><span style="font-style: italic;">k</span><span>)</span><span> </span><span>{</span><span> </span><span>…</span><span> </span><span>}</span><br></div><div style="padding-left:2.0em;"><span style="font-weight:bold;">else</span><span> </span><span>{</span><br></div><div style="padding-left:3.0em;"><span style="font-weight:bold;">if</span><span> </span><span>(</span><span style="font-style: italic;">has_black_root</span><span>(</span><span style="font-style: italic;">root</span><span>-</span><span>&gt;</span><span style="font-style: italic;">lft</span><span>)</span><span>)</span><span> </span><span>{</span><span> </span><span>…</span><span> </span><span>}</span><br></div><div style="padding-left:3.0em;"><span style="font-weight:bold;">else</span><span> </span><span>{</span><br></div><div style="padding-left:4.0em;"><span style="font-weight:bold;">if</span><span> </span><span>(</span><span style="font-style: italic;">key</span><span> </span><span>&lt;</span><span> </span><span style="font-style: italic;">k</span><span>)</span><span> </span><span>{</span><br></div><div style="padding-left:5.0em;"><span style="font-weight:bold;">bool</span><span> </span><span style="font-style: italic;">fix</span><span> </span><span>=</span><span> </span><span style="font-style: italic;">llrb_insert_R</span><span>(</span><span style="font-style: italic;">key</span><span>,</span><span> </span><span style="font-style: italic;">value</span><span>,</span><span> </span><span>&amp;</span><span>(</span><span style="font-style: italic;">root</span><span>-</span><span>&gt;</span><span style="font-style: italic;">lft</span><span>)</span><span>)</span><span>;</span><br></div><div style="padding-left:5.0em;"><span style="font-weight:bold;">if</span><span> </span><span>(</span><span style="font-style: italic;">fix</span><span>)</span><span> </span><span>{</span><br></div><div style="padding-left:6.0em;"><span class="vf_comment"><span style="font-weight:bold;">assert</span><span> </span><span style="font-style: italic;">RVLeft</span><span>(</span><span style="font-style: italic;">t</span><sub>1</sub><span>,</span><span> </span><span style="font-style: italic;">h</span><span>)</span><span>;</span></span><br></div><div style="padding-left:6.0em;"><span style="font-style: italic;">root</span><span> </span><span>=</span><span> </span><span style="font-style: italic;">fix_RVLeft</span><span>(</span><span style="font-style: italic;">root</span><span>)</span><span>;</span><br></div><div style="padding-left:6.0em;"><span>*</span><span style="font-style: italic;">rootptr</span><span> </span><span>=</span><span> </span><span style="font-style: italic;">root</span><span>;</span><br></div><div style="padding-left:6.0em;"><span style="font-weight:bold;">return</span><span> </span><span style="font-weight:bold;">true</span><span>;</span><br></div><div style="padding-left:5.0em;"><span>}</span><br></div><div style="padding-left:5.0em;"><span style="font-weight:bold;">else</span><span> </span><span>{</span><br></div><div style="padding-left:6.0em;"><span style="font-weight:bold;">return</span><span> </span><span style="font-weight:bold;">false</span><span>;</span><br></div><div style="padding-left:5.0em;"><span>}</span><br></div><div style="padding-left:4.0em;"><span>}</span><br></div><div style="padding-left:4.0em;"><span style="font-weight:bold;">else</span><span> </span><span>{</span><span> </span><span>…</span><span> </span><span>}</span><br></div><div style="padding-left:3.0em;"><span>}</span><br></div><div style="padding-left:2.0em;"><span>}</span><br></div><div style="padding-left:1.0em;"><span>}</span><br></div><div style="padding-left:0.0em;"><span>}</span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+</div>
+<div class="col-2">
+<p class="fragment">
+We have inserted into a red left subtree.
+</p>
+<p class="space-2 fragment">
+We now have to fix the tree.
+</p>
+<p class="space-2 fragment">
+We use a fixer
+<span>
+<span style="font-style: italic;">fix_RVLeft</span></span>
+
+to do that.
+</p>
+<p class="space-2 fragment">
+This fixer has to transform
+something called an <span>
+<span style="font-style: italic;">RVLeft</span></span>
+
+into a red-rooted tree.
+</p>
+</div>
+</div>
+</section>
+<section>
+<h2>
+Fixing an RVLeft</h2>
+<p class="space-2">
+<img src="diagrams/llrb/fixers/fix_RVLeft.svg" />
+
+</p>
+<p class="space-2 fragment">
+This can be decomposed:
+<strong>
+rotate right</strong></strong>
+and <strong>recolor left</strong>.
+</p>
+</section>
+<section>
+<h2>
+Fixing an RVLeft: algorithm</h2>
+<div>
+<div class="col-2">
+<p>
+<img src="diagrams/llrb/fixers/fix_RVLeft_steps.svg" />
+
+</p>
+</div>
+<div class="fragment col-2">
+<div class="snipBlock smaller">
+<div>
+<div style="padding-left:0.0em;"><span style="font-style: italic;">TreeNodePtr</span><span> </span><span style="font-style: italic;">fix_RVLeft</span><span>(</span><span style="font-style: italic;">TreeNodePtr</span><span> </span><span style="font-style: italic;">root</span><span>)</span><br></div><div style="padding-left:0.0em;"><span class="vf_comment"><span style="font-weight:bold;">requires</span><span> </span><span style="font-style: italic;">IsTree</span><span>(</span><span style="font-style: italic;">root</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">t</span><sub>0</sub><span>)</span><span> </span><span>∗</span><span> </span><span style="font-style: italic;">RVLeft</span><span>(</span><span style="font-style: italic;">t</span><sub>0</sub><span>,</span><span> </span><span>?</span><span style="font-style: italic;">h</span><span>)</span><span>;</span></span><br></div><div style="padding-left:0.0em;"><span class="vf_comment"><span style="font-weight:bold;">ensures</span><span> </span><span style="font-style: italic;">IsTree</span><span>(</span><span style="font-style: italic;">result</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">t</span><sub>1</sub><span>)</span><span> </span><span>∗</span><span> </span><span style="font-style: italic;">IsLLRB</span><span>(</span><span style="font-style: italic;">t</span><sub>1</sub><span>,</span><span> </span><span style="font-style: italic;">Red</span><span>,</span><span> </span><span style="font-style: italic;">h</span><span>)</span><span> </span><span>∗</span><span> </span><span style="font-style: italic;">flatten</span><span>(</span><span style="font-style: italic;">t</span><sub>1</sub><span>)</span><span> </span><span>==</span><span> </span><span style="font-style: italic;">flatten</span><span>(</span><span style="font-style: italic;">t</span><sub>0</sub><span>)</span><span>;</span></span><br></div><div style="padding-left:0.0em;"><span>{</span><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-style: italic;">RVLeft_has_left_branch</span><span>(</span><span style="font-style: italic;">t</span><sub>0</sub><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-weight:bold;">open</span><span> </span><span style="font-style: italic;">RVLeft</span><span>(</span><span style="font-style: italic;">t</span><sub>0</sub><span>,</span><span> </span><span style="font-style: italic;">h</span><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-weight:bold;">open</span><span> </span><span style="font-style: italic;">RV</span><span>(</span><span style="font-style: italic;">_</span><span>,</span><span> </span><span style="font-style: italic;">h</span><span>-</span><span>1</span><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><span style="font-style: italic;">TreeNodePtr</span><span> </span><span style="font-style: italic;">result</span><span> </span><span>=</span><span> </span><span style="font-style: italic;">rotate_right</span><span>(</span><span style="font-style: italic;">root</span><span>)</span><span>;</span><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-style: italic;">rotate_right_branches</span><span>(</span><span style="font-style: italic;">t</span><sub>0</sub><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-style: italic;">rotate_right_maintains_values</span><span>(</span><span style="font-style: italic;">t</span><sub>0</sub><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-weight:bold;">open</span><span> </span><span style="font-style: italic;">Branch</span><span>(</span><span>?</span><span style="font-style: italic;">t</span><sub>1</sub><span>,</span><span> </span><span>?</span><span style="font-style: italic;">l</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">dk</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">dv</span><span>,</span><span> </span><span style="font-style: italic;">Red</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">r</span><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-weight:bold;">open</span><span> </span><span style="font-style: italic;">Branch</span><span>(</span><span style="font-style: italic;">r</span><span>,</span><span> </span><span style="font-style: italic;">_</span><span>,</span><span> </span><span style="font-style: italic;">_</span><span>,</span><span> </span><span style="font-style: italic;">_</span><span>,</span><span> </span><span style="font-style: italic;">Blk</span><span>,</span><span> </span><span style="font-style: italic;">_</span><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-weight:bold;">close</span><span> </span><span style="font-style: italic;">IsLLRB</span><span>(</span><span style="font-style: italic;">r</span><span>,</span><span> </span><span style="font-style: italic;">Blk</span><span>,</span><span> </span><span style="font-style: italic;">_</span><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-weight:bold;">open</span><span> </span><span style="font-style: italic;">IsTree</span><span>(</span><span style="font-style: italic;">result</span><span>,</span><span> </span><span style="font-style: italic;">t</span><sub>1</sub><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><span style="font-style: italic;">TreeNodePtr</span><span> </span><span style="font-style: italic;">lft</span><span> </span><span>=</span><span> </span><span style="font-style: italic;">result</span><span>-</span><span>&gt;</span><span style="font-style: italic;">lft</span><span>;</span><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-style: italic;">red_has_branch</span><span>(</span><span style="font-style: italic;">l</span><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><span style="font-style: italic;">blacken_R</span><span>(</span><span style="font-style: italic;">lft</span><span>)</span><span>;</span><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-style: italic;">blacken_R_applied_to_R</span><span>(</span><span style="font-style: italic;">l</span><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-weight:bold;">assert</span><span> </span><span style="font-style: italic;">IsTree</span><span>(</span><span style="font-style: italic;">lft</span><span>,</span><span> </span><span>?</span><span style="font-style: italic;">newl</span><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-weight:bold;">close</span><span> </span><span style="font-style: italic;">IsLLRB</span><span>(</span><span style="font-style: italic;">Branch</span><span>(</span><span style="font-style: italic;">newl</span><span>,</span><span> </span><span style="font-style: italic;">dk</span><span>,</span><span> </span><span style="font-style: italic;">dv</span><span>,</span><span> </span><span style="font-style: italic;">Red</span><span>,</span><span> </span><span style="font-style: italic;">r</span><span>)</span><span>,</span><span> </span><span style="font-style: italic;">Red</span><span>,</span><span> </span><span style="font-style: italic;">h</span><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><span class="vf_comment"><span style="font-weight:bold;">close</span><span> </span><span style="font-style: italic;">IsTree</span><span>(</span><span style="font-style: italic;">result</span><span>,</span><span> </span><span style="font-style: italic;">_</span><span>)</span><span>;</span></span><br></div><div style="padding-left:1.0em;"><span style="font-weight:bold;">return</span><span> </span><span style="font-style: italic;">result</span><span>;</span><br></div><div style="padding-left:0.0em;"><span>}</span><br></div><div style="padding-left:0.0em;"><br></div>
+</div>
+
+</div>
+</div>
+</div>
+
+</section>
+
+
+<section>
+<h2>
+More operations</h2>
+<p class="space-2 fragment">
+All that was a small fragment of LLRB insert.
+</p>
+<p class="space-2 fragment">
+The rest of insert is done too!
+</p>
+<p class="space-2 fragment">
+So are these operations …
+</p>
+<ul class="listTable listTable2 space-3">
+<li class="fragment">
+Search</li>
+<li class="fragment">
+Iterate</li>
+<li class="fragment">
+Remove the min.</li>
+<li class="fragment">
+Remove</li>
+</ul>
+</section>
+
+<section>
+<h1>
+Evaluation
+</h1>
+</section>
+<section>
+<h2>
+Limitations of VeriFast</h2>
+<ul class="listTable listTable3 smallish space-4">
+<li class="fragment">
+Only partial correctness</li>
+<li class="fragment">
+Fixpoint totality</li>
+<li class="fragment">
+Memory complexity</li>
+<li class="fragment">
+No purity</li>
+<li class="fragment">
+No dependent types</li>
+<li class="fragment">
+No interfaces</li>
+<li class="fragment">
+Fact representation</li>
+<li class="fragment">
+Un-natural C</li>
+<li class="fragment">
+Pattern-matching</li>
+<li class="fragment">
+Vacuuous truth</li>
+<li class="fragment">
+Lack of documentation</li>
+<li class="fragment">
+Closed source!</li>
+</ul>
+</section>
+<section>
+<h2>
+Correspondence</h2>
+<p class="space-2 fragment">
+A lot of emails
+went back and forth
+between me and Bart!
+</p>
+<p class="space-2 fragment">
+Uncovered a number of (mostly trivial) bugs.
+</p>
+<p class="space-2 fragment">
+Most were fixed quickly.
+</p>
+<p class="space-2 fragment">
+Also had to contact Bart
+for help on undocumented or unclear features.
+</p>
+</section>
+
+<section>
+<h2>
+One predicate to rule them all</h2>
+<p class="space-2 fragment">
+This report presented the pieces of the verification puzzle
+in many chunks:
+Trees,
+fixpoints,
+predicates.
+</p>
+<p class="space-2 fragment">
+When I first started,
+I had one large predicate
+that expressed
+the memory layout,
+the LLRB structure,
+and the sortedness.
+</p>
+<p class="space-2 fragment">
+Unwieldy.
+</p>
+</section>
+<section>
+<h2>
+Partial verification is useful!</h2>
+<p class="space-2 fragment">
+Tried to verify too much at once:
+</p>
+<ul class="listTable listTable3 smallish space-4">
+<li class="fragment">
+Memory allocation</li>
+<li class="fragment">
+Key ordering</li>
+<li class="fragment">
+Red rule </li>
+<li class="fragment">
+Black rule</li>
+<li class="fragment">
+Index specification</li>
+</ul>
+<p class="space-2 fragment">
+Better approach:
+work from the least to most challenging.
+</p>
+<p class="space-2 fragment">
+This is how verification would proceed in a practical environment.
+</p>
+</section>
+<section>
+<h2>
+Multiple equivalent definitions</h2>
+<p class="space-2 fragment">
+For searching BSTs,
+I used a <q>naturalistic</q> definition of sortedness:
+</p>
+<p class="space-2 fragment">
+keys in left tree less than root,
+keys in right tree greater than root,
+subtrees sorted too.
+</p>
+<p class="space-2 fragment">
+Had to prove equivalence with
+the definition seen in this presentation.
+</p>
+</section>
+<section>
+<h2>
+Further work</h2>
+<div class="smallish">
+<p class="space-2 fragment">
+<strong>
+Iterative implementations.
+</strong>
+I verified an iterative search,
+but other operations
+will be significantly different to their recursive versions.
+</p>
+<p class="space-2 fragment">
+<strong>
+Express the red rule in the algebraic type.
+</strong>
+This rule
+can be defined using
+standard functional languages;
+VeriFast is no different.
+</p>
+<p class="space-2 fragment">
+<strong>
+More tree operations.
+</strong>
+I have specifications but no implementations for
+mapValues,
+mapKeysMonotonic,
+and union.
+</p>
+<p class="space-2 fragment">
+<strong>
+Similar data structures.
+</strong>
+The most obvious is the classic Red-Black tree.
+Others include the AA tree
+and, to a lesser extent, the AVL tree.
+</p>
+</div>
+</section>
+
+
+<section>
+<h1>
+Conclusion
+</h1>
+<p class="space-2 fragment">
+Assessment of practicability of
+machine-assisted program verification.
+</p>
+<p class="space-2 fragment">
+Rule of diminishing returns.
+</p>
+<p class="space-2 fragment">
+Particulars
+(VeriFast, LLRB)
+well-chosen.
+</p>
+<p class="space-2 fragment">
+Boundaries of verification with VeriFast reached.
+</p>
+<p class="space-2 fragment">
+Major VeriFast project.
+About 5,000 lines.
+</p>
+<p class="space-2 fragment">
+Good potential for further work.
+</p>
+</section>
+<section>
+<h1>
+Questions?</h1>
+</section>
+
+</div>
+<aside class="controls">
+<a class="left" href="#">
+&#x25C4;</a></a>
+<a class="right" href="#">
+&#x25BA;</a></a>
+<a class="up" href="#">
+&#x25B2;</a></a>
+<a class="down" href="#">
+&#x25BC;</a></a>
+</aside>
+<div id="timer">
+</div>
+<div class="progress">
+<span>
+</span>
+</div>
+</div>
+<script type="text/javascript" src="jquery-1.8.0.min.js">
+</script>
+<script type="text/javascript" src="reveal.js-1.4/js/reveal.js">
+</script>
+<script type="text/javascript" src="pres.js">
+</script>
+</body>
+</html>
